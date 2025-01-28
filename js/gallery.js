@@ -64,42 +64,45 @@ const images = [
   },
 ];
 
-document.addEventListener("contextmenu", function (event) {
-  if (event.target.tagName === "IMG") {
-    event.preventDefault();
+const galleryContainer = document.querySelector("ul.gallery");
+
+const galleryMarkup = images
+  .map(
+    ({ preview, original, description }) => `
+      <li class="gallery-item">
+        <a class="gallery-link" href="${original}">
+          <img
+            class="gallery-image"
+            src="${preview}"
+            data-source="${original}"
+            alt="${description}"
+          />
+        </a>
+      </li>`
+  )
+  .join("");
+
+galleryContainer.innerHTML = galleryMarkup;
+
+galleryContainer.addEventListener("click", onGalleryClick);
+
+function onGalleryClick(event) {
+  event.preventDefault();
+  if (event.target.nodeName !== "IMG") {
+    return;
   }
-});
 
-document.addEventListener("click", function (event) {
-  if (event.target.tagName === "IMG") {
-    event.preventDefault();
-  }
-});
+  const largeImageURL = event.target.dataset.source;
 
-document.addEventListener("dragstart", function (event) {
-  if (event.target.tagName === "IMG") {
-    event.preventDefault();
-  }
-});
-document.querySelector(".gallery").addEventListener("click", function (event) {
-  if (event.target.tagName === "IMG") {
-    event.preventDefault();
+  const instance = basicLightbox.create(`
+    <img src="${largeImageURL}" alt="${event.target.alt}" />
+  `);
+  instance.show();
+}
 
-    const largeImageURL = event.target.dataset.source;
-
-    console.log(largeImageURL);
-  }
-});
-document.querySelector(".gallery").addEventListener("click", (event) => {
-  if (event.target.tagName === "IMG") {
-    event.preventDefault();
-
-    const largeImageURL = event.target.dataset.source;
-
-    const instance = basicLightbox.create(`
-      <img src="${largeImageURL}" alt="${event.target.alt}" />
-    `);
-
-    instance.show();
-  }
-});
+function openModal(imageUrl) {
+  const instance = basicLightbox.create(`
+    <img src="${imageUrl}" alt="Large Image" />
+  `);
+  instance.show();
+}
